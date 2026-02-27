@@ -78,6 +78,7 @@ public class UpdateController {
                 mainController.refreshStudentsTable();
 
                 CustomJOptionPane.showSuccessDialog(UpdateController.this.parent, "Student has been updated!");
+                parent.dispose();
                 return;
             }
 
@@ -122,8 +123,8 @@ public class UpdateController {
 
                     DatabaseService.students.remove(student);
                     DatabaseService.saveToDatabase();
-                    mainController.refreshStudentsTable();
                     CustomJOptionPane.showSuccessDialog(parent, "Student has been removed!");
+                    mainController.refreshStudentsTable();
                     parent.dispose();
 
                     return;

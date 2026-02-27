@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.Enumeration;
 
 public class MainView extends JFrame {
-    private final String[] tableColumn = {
+    private final String[] tableColumns = {
             "UUID",
             "First name",
             "Last name",
@@ -26,7 +26,7 @@ public class MainView extends JFrame {
         mainPanel.setLayout(mainLayout);
         mainPanel.setBorder(padding);
 
-        MainController mainController = new MainController(this);
+        MainController mainController = new MainController(this, tableColumns);
 
         // ========== START OF COMPONENTS ==========
 
@@ -93,6 +93,16 @@ public class MainView extends JFrame {
         formButtonPanel.add(resetFormButton);
         formButtonPanel.add(addStudentButton);
 
+        JTextField searchField = new JTextField();
+        mainController.setSearchField(searchField);
+        searchField.setPreferredSize(new Dimension(400, 25));
+        JButton searchButton = new JButton("Search");
+        searchButton.addActionListener(mainController.new searchStudentOnAction());
+        JPanel tableSearchPanel = new JPanel();
+        tableSearchPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        tableSearchPanel.add(searchField);
+        tableSearchPanel.add(searchButton);
+
         JPopupMenu tablePopupMenu = new JPopupMenu();
         JMenuItem deleteStudentItem = new JMenuItem("Delete");
         deleteStudentItem.addActionListener(mainController.new deleteStudentOnAction());
@@ -101,13 +111,21 @@ public class MainView extends JFrame {
         tablePopupMenu.add(updateStudentItem);
         tablePopupMenu.add(deleteStudentItem);
 
-        DefaultTableModel studentsTableModel = new DefaultTableModel(tableColumn, 0);
+        DefaultTableModel studentsTableModel = new DefaultTableModel(tableColumns, 0);
         mainController.setStudentsTableModel(studentsTableModel);
         JTable studentsTable = new JTable(studentsTableModel);
         mainController.setStudentsTable(studentsTable);
         studentsTable.setComponentPopupMenu(tablePopupMenu);
         JScrollPane studentsTablePane = new JScrollPane();
         studentsTablePane.setViewportView(studentsTable);
+
+        JButton exportButton = new JButton("Export");
+        exportButton.addActionListener(mainController.new exportStudentsOnAction());
+        JButton importButton = new JButton("Import");
+        JPanel tableButtonsPanel = new JPanel();
+        tableButtonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        tableButtonsPanel.add(exportButton);
+        tableButtonsPanel.add(importButton);
 
         // ========== END OF COMPONENTS ==========
 
@@ -123,7 +141,11 @@ public class MainView extends JFrame {
         mainPanel.add(Box.createRigidArea(new Dimension(0, 2)));
         mainPanel.add(formButtonPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        mainPanel.add(tableSearchPanel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
         mainPanel.add(studentsTablePane);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        mainPanel.add(tableButtonsPanel);
 
         mainController.loadStudentsTable();
 

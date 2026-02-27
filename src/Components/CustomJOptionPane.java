@@ -1,7 +1,9 @@
 package Components;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
+import java.io.File;
 
 public class CustomJOptionPane extends JOptionPane {
     public static void showErrorDialog(Component parent, String message) {
@@ -20,5 +22,21 @@ public class CustomJOptionPane extends JOptionPane {
                 "Success",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    public static File showSaveToXlxsDialog(JFrame parent) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save a xlxs file");
+        fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        int selected = fileChooser.showSaveDialog(parent);
+        if (selected != JFileChooser.APPROVE_OPTION) return null;
+
+        File selectedFile = fileChooser.getSelectedFile();
+        String path = selectedFile.getAbsolutePath();
+        if (!path.toLowerCase().endsWith(".xlsx")) selectedFile = new File(path + ".xlsx");
+        return selectedFile;
     }
 }

@@ -1,3 +1,6 @@
+### Application Data ###
+students.bin
+
 ### IntelliJ IDEA ###
 out/
 !**/src/main/**/out/
@@ -28,3 +31,10 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties

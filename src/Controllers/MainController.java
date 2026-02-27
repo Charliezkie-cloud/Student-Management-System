@@ -5,26 +5,40 @@ import Models.Student;
 import Services.DatabaseService;
 import Views.UpdateView;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Objects;
 
 public class MainController {
     final private JFrame parent;
 
+    private String[] tableColumns = { };
+
     private JTextField firstNameField;
     private JTextField lastNameField;
     private JTextField middleNameField;
     private JComboBox<String> courseBox;
     private ButtonGroup yearButtonGroup;
+    private JTextField searchField;
     private DefaultTableModel studentsTableModel;
     private JTable studentsTable;
 
-    public MainController(JFrame parent) {
+    public MainController(JFrame parent, String[] tableColumns) {
         this.parent = parent;
+        this.tableColumns = tableColumns;
     }
 
     // Setters
@@ -33,6 +47,7 @@ public class MainController {
     public void setMiddleNameField(JTextField middleNameField) { this.middleNameField = middleNameField; }
     public void setCourseBox(JComboBox<String> courseBox) { this.courseBox = courseBox; }
     public void setYearButtonGroup(ButtonGroup yearButtonGroup) { this.yearButtonGroup = yearButtonGroup; }
+    public void setSearchField(JTextField searchField) { this.searchField = searchField; }
     public void setStudentsTableModel(DefaultTableModel studentsTableModel) { this.studentsTableModel = studentsTableModel; }
     public void setStudentsTable(JTable studentsTable) { this.studentsTable = studentsTable; }
 
@@ -86,6 +101,20 @@ public class MainController {
         }
     }
 
+    public class searchStudentOnAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<DefaultTableModel>(studentsTableModel);
+            studentsTable.setRowSorter(sorter);
+
+            String search = searchField.getText();
+            if (!search.isEmpty())
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + search));
+            else
+                sorter.setRowFilter(null);
+        }
+    }
+
     public class updateStudentOnAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -135,7 +164,35 @@ public class MainController {
         }
     }
 
+    public class exportStudentsOnAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File result = CustomJOptionPane.showSaveToXlxsDialog(parent);
+            if (result != null) exportStudents(result);
+        }
+    }
+
     // Helpers
+    public void loadStudentsTable() {
+        DatabaseService.readFromDatabase();
+        for (Student student : DatabaseService.students) {
+            studentsTableModel.addRow(new Object[] {
+                    student.getUuid().toString(),
+                    student.getFirstName(),
+                    student.getLastName(),
+                    student.getMiddleName(),
+                    student.getCourse(),
+                    student.getYear()
+            });
+        }
+    }
+
+    public void refreshStudentsTable() {
+        studentsTableModel.getDataVector().removeAllElements();
+        studentsTableModel.fireTableDataChanged();
+        loadStudentsTable();
+    }
+
     private boolean validateForm() {
         if (firstNameField.getText().length() > 50 || firstNameField.getText().length() < 3) {
             CustomJOptionPane.showErrorDialog(parent, "First name must be between 3 and 50 characters.");
@@ -175,25 +232,6 @@ public class MainController {
         return true;
     }
 
-    public void loadStudentsTable() {
-        DatabaseService.readFromDatabase();
-        for (Student student : DatabaseService.students) {
-            studentsTableModel.addRow(new Object[] {
-                    student.getUuid().toString(),
-                    student.getFirstName(),
-                    student.getLastName(),
-                    student.getMiddleName(),
-                    student.getCourse(),
-                    student.getYear()
-            });
-        }
-    }
-
-    public void refreshStudentsTable() {
-        studentsTableModel.getDataVector().removeAllElements();
-        loadStudentsTable();
-    }
-
     private void addStudentToTable(Student student) {
         studentsTableModel.addRow(new Object[] {
                 student.getUuid().toString(),
@@ -203,6 +241,45 @@ public class MainController {
                 student.getCourse(),
                 student.getYear()
         });
+    }
+
+    private void exportStudents(File filePath) {
+        Workbook workBook = new XSSFWorkbook();
+        Sheet sheet = workBook.createSheet("Students");
+
+        int rowIndex = 0;
+        Row headerRow = sheet.createRow(rowIndex++);
+        for (int i = 0; i < tableColumns.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(tableColumns[i]);
+        }
+
+        for (Student student : DatabaseService.students) {
+            Row row = sheet.createRow(rowIndex++);
+            int colIndex = 0;
+            row.createCell(colIndex++).setCellValue(student.getUuid().toString());
+            row.createCell(colIndex++).setCellValue(student.getFirstName());
+            row.createCell(colIndex++).setCellValue(student.getMiddleName());
+            row.createCell(colIndex++).setCellValue(student.getLastName());
+            row.createCell(colIndex++).setCellValue(student.getCourse());
+            row.createCell(colIndex++).setCellValue(student.getYear());
+        }
+
+        for (int colIndex = 0; colIndex < tableColumns.length; colIndex++) {
+            sheet.autoSizeColumn(colIndex);
+        }
+
+        try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+            workBook.write(outputStream);
+        } catch (IOException ex) {
+            CustomJOptionPane.showErrorDialog(parent, ex.getMessage());
+        } finally {
+            try {
+                workBook.close();
+            } catch (IOException ex) {
+                CustomJOptionPane.showErrorDialog(parent, ex.getMessage());
+            }
+        }
     }
 }
 
