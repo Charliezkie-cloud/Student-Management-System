@@ -26,6 +26,7 @@ public class MainView extends JFrame {
         mainPanel.setLayout(mainLayout);
         mainPanel.setBorder(padding);
 
+        System.setProperty("log4j.configurationFile", "src/resources/log4j2.xml");
         MainController mainController = new MainController(this, tableColumns);
 
         // ========== START OF COMPONENTS ==========
@@ -121,11 +122,9 @@ public class MainView extends JFrame {
 
         JButton exportButton = new JButton("Export");
         exportButton.addActionListener(mainController.new exportStudentsOnAction());
-        JButton importButton = new JButton("Import");
         JPanel tableButtonsPanel = new JPanel();
         tableButtonsPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
         tableButtonsPanel.add(exportButton);
-        tableButtonsPanel.add(importButton);
 
         // ========== END OF COMPONENTS ==========
 

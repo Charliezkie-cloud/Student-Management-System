@@ -5,10 +5,7 @@ import Models.Student;
 import Services.DatabaseService;
 import Views.UpdateView;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import javax.swing.*;
@@ -16,14 +13,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Enumeration;
 import java.util.Objects;
 
 public class MainController {
-    final private JFrame parent;
+    private final JFrame parent;
 
     private String[] tableColumns = { };
 
@@ -167,7 +162,7 @@ public class MainController {
     public class exportStudentsOnAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            File result = CustomJOptionPane.showSaveToXlxsDialog(parent);
+            File result = CustomJOptionPane.showSaveToXlsxDialog(parent);
             if (result != null) exportStudents(result);
         }
     }

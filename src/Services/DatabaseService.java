@@ -16,7 +16,6 @@ public class DatabaseService {
         try (ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(databasePath))) {
             outputStream.writeObject(students);
         } catch (IOException ex) {
-            ex.printStackTrace();
             CustomJOptionPane.showErrorDialog(null, ex.getMessage());
         }
     }
@@ -29,7 +28,6 @@ public class DatabaseService {
         try (ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(databasePath))) {
             students = (ArrayList<Student>) inputStream.readObject();
         } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
             CustomJOptionPane.showErrorDialog(null, ex.getMessage());
         }
     }

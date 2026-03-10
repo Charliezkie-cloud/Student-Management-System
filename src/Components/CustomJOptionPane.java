@@ -24,9 +24,9 @@ public class CustomJOptionPane extends JOptionPane {
         );
     }
 
-    public static File showSaveToXlxsDialog(JFrame parent) {
+    public static File showSaveToXlsxDialog(JFrame parent) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Save a xlxs file");
+        fileChooser.setDialogTitle("Save a xlsx file");
         fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
         fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
         fileChooser.setAcceptAllFileFilterUsed(false);
@@ -38,5 +38,20 @@ public class CustomJOptionPane extends JOptionPane {
         String path = selectedFile.getAbsolutePath();
         if (!path.toLowerCase().endsWith(".xlsx")) selectedFile = new File(path + ".xlsx");
         return selectedFile;
+    }
+
+    public static File showOpenXlsxDialog(JFrame parent) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Open a xlsx file");
+        fileChooser.setCurrentDirectory(fileChooser.getCurrentDirectory());
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+        fileChooser.setAcceptAllFileFilterUsed(false);
+
+        int selected = fileChooser.showOpenDialog(parent);
+        if (selected != JFileChooser.APPROVE_OPTION) return null;
+
+        File selectedFile = fileChooser.getSelectedFile();
+        String path = selectedFile.getAbsolutePath();
+        return new File(path);
     }
 }
